@@ -13,10 +13,14 @@ public class Main {
 
     public static void main(String[] args) {
         inserePersonagens();
-        jogo();
+        try{
+            jogo();
+        } catch (RuntimeException err){
+            System.out.println("Erro: " + err.getClass().getSimpleName());
+        }
     }
 
-    private static void jogo(){
+    private static void jogo() throws RuntimeException{
         int counter = 0;
         do{
             mapa();
@@ -33,7 +37,14 @@ public class Main {
                         "\n-->: ");
                 int opcao = sc.nextInt();
                 switch (opcao){
-                    case 1 -> jogadorAoBarco();
+                    case 1 -> {
+                        try{
+                            jogadorAoBarco();
+                        }
+                        catch (RuntimeException ex){
+                            System.out.println("Erro: " + ex.getClass().getSimpleName());
+                        }
+                    }
                     case 2 -> retiraDoBarco();
                 }
                 counter = 0;
@@ -43,23 +54,24 @@ public class Main {
         if(counter == 6){
             System.out.println("Boa viado, ganhastes");
         } else {
-            System.out.println("Vish pae, perdeste, deixou o coitado do missionário junto com o canibalzera, séloko;");
+            throw new LooserException();
         }
     };
 
-    private static void jogadorAoBarco(){
+    private static void jogadorAoBarco() throws RuntimeException{
         System.out.print("Digite o jogador que deseja colocar no barco.\n-->: ");
         String decisao = sc.next();
         for (Pessoa jogador : listaLadoDireito) {
             if (jogador.isActivated() && jogador.getSigla().equals(decisao)) {
-
                 if(barcoVetor[0] == null){
                     barcoVetor[0] = jogador.getSigla();
+                    jogador.setActivated(false);
                 } else if(barcoVetor[1] == null){
                     barcoVetor[1] = jogador.getSigla();
+                    jogador.setActivated(false);
+                } else if(barcoVetor.length == 2){
+                    throw new BoatNumberException();
                 }
-
-                jogador.setActivated(false);
             }
         }
         for (Pessoa jogador : listaLadoEsquerdo) {
@@ -69,6 +81,8 @@ public class Main {
                     barcoVetor[0] = jogador.getSigla();
                 } else if(barcoVetor[1] == null){
                     barcoVetor[1] = jogador.getSigla();
+                } else if(barcoVetor.length == 2){
+                    throw new BoatNumberException();
                 }
 
                 jogador.setActivated(false);
